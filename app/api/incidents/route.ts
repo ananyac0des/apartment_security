@@ -4,7 +4,11 @@ export async function GET() {
   const data = await prisma.incident.findMany({
     include: {
       security_guard: true,
-      apartment: true,
+      apartment: {
+        select: {
+          unit_number: true,
+        },
+      },
     },
     orderBy: { incident_date: "desc" },
   });

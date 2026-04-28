@@ -2,6 +2,15 @@
 
 import { useEffect, useState } from "react";
 
+const getSeverityColor = (severity: string) => {
+  switch (severity) {
+    case "critical": return "text-red-600";
+    case "high": return "text-orange-600";
+    case "medium": return "text-yellow-600";
+    default: return "text-green-600";
+  }
+};
+
 export default function IncidentsPage() {
   const [incidents, setIncidents] = useState<any[]>([]);
   const [guards, setGuards] = useState<any[]>([]);
@@ -107,6 +116,7 @@ export default function IncidentsPage() {
             <th>Date</th>
             <th>Description</th>
             <th>Severity</th>
+            <th>Unit</th>
             <th>Guard</th>
             <th>Status</th>
           </tr>
@@ -119,11 +129,14 @@ export default function IncidentsPage() {
                 {new Date(i.incident_date).toLocaleString()}
               </td>
               <td>{i.description}</td>
-              <td className="font-bold">{i.severity}</td>
+              <td className={`font-bold capitalize ${getSeverityColor(i.severity)}`}>
+                {i.severity}
+              </td>
+              <td>{i.apartment?.unit_number || "N/A"}</td>
               <td>{i.security_guard?.full_name}</td>
               <td>
                 {i.resolved ? (
-                  "Resolved"
+                  <span className="text-green-600 font-bold">Resolved</span>
                 ) : (
                   <button
                     onClick={() =>
