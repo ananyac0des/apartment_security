@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
+export default function EntryPage() {
   const [authorized, setAuthorized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const role = localStorage.getItem("role");
 
-    if (role !== "resident") {
-      alert("Access denied. Resident only.");
+    if (role !== "guard") {
+      alert("Access denied. Guard only.");
       router.push("/login");
     } else {
       setAuthorized(true);
@@ -22,8 +22,8 @@ export default function Home() {
 
   return (
     <div className="text-black p-6">
-      <h1 className="text-2xl font-bold">Resident Dashboard</h1>
-      {/* your existing residents UI */}
+      <h1 className="text-2xl font-bold">Entry Logs (Guard Only)</h1>
+      {/* your existing entry UI stays here */}
     </div>
   );
 }

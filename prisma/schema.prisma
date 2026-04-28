@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model access_card {
+  card_id     Int       @id @default(autoincrement())
+  card_number String    @unique(map: "card_number") @db.VarChar(20)
+  resident_id Int?
+  issued_date DateTime  @db.Date
+  expiry_date DateTime  @db.Date
+  is_active   Boolean?  @default(true)
+  resident    resident? @relation(fields: [resident_id], references: [resident_id], onDelete: NoAction, onUpdate: NoAction, map: "access_card_ibfk_1")
+
+  @@index([resident_id], map: "resident_id")
+}
+
+model apartment {
+  apartment_id        Int                   @id @default(autoincrement())
+  unit_number         String                @unique(map: "unit_number") @db.VarChar(10)
+  floor_number        Int
+  block               String                @db.Char(1)
+  status              apartment_status?     @default(vacant)
+  incident            incident[]
+  maintenance_request maintenance_request[]
+  resident            resident[]
+}
+
+model blacklist {
+  blacklist_id   Int             @id @default(autoincrement())
+  visitor_id     Int?
+  reason         String?         @db.Text
+  blacklisted_on DateTime        @db.Date
+  blacklisted_by Int?
+  is_active      Boolean?        @default(true)
+  visitor        visitor?        @relation(fields: [visitor_id], references: [visitor_id], onDelete: NoAction, onUpdate: NoAction, map: "blacklist_ibfk_1")
+  security_guard security_guard? @relation(fields: [blacklisted_by], references: [guard_id], onDelete: NoAction, onUpdate: NoAction, map: "blacklist_ibfk_2")
+
+  @@index([blacklisted_by], map: "blacklisted_by")
+  @@index([visitor_id], map: "visitor_id")
+}
+
+model cctv_camera {
+  camera_id      Int       @id @default(autoincrement())
+  location       String    @db.VarChar(100)
+  floor_number   Int?
+  is_active      Boolean?  @default(true)
+  installed_date DateTime? @db.Date
+}
+
+model emergency_contact {
+  contact_id   Int      @id @default(autoincrement())
+  resident_id  Int
+  contact_name String   @db.VarChar(100)
+  relationship String?  @db.VarChar(50)
+  phone        String   @db.VarChar(15)
+  is_primary   Boolean? @default(false)
+  resident     resident @relation(fields: [resident_id], references: [resident_id], onDelete: NoAction, onUpdate: NoAction, map: "emergency_contact_ibfk_1")
+
+  @@index([resident_id], map: "resident_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model emp {
+  emp_id   Int      @id
+  fullname String?  @db.VarChar(100)
+  salary   Decimal? @db.Decimal(10, 2)
+}
+
+model employee {
+  emp_id    Int      @id
+  full_name String?  @db.VarChar(100)
+  salary    Decimal? @db.Decimal(10, 2)
+}
+
+model entry_log {
+  log_id         Int                   @id @default(autoincrement())
+  entry_time     DateTime              @db.DateTime(0)
+  exit_time      DateTime?             @db.DateTime(0)
+  person_type    entry_log_person_type
+  resident_id    Int?
+  visitor_id     Int?
+  guard_id       Int?
+  purpose        String                @default("General") @db.VarChar(200)
+  resident       resident?             @relation(fields: [resident_id], references: [resident_id], onDelete: NoAction, onUpdate: NoAction, map: "entry_log_ibfk_1")
+  visitor        visitor?              @relation(fields: [visitor_id], references: [visitor_id], onDelete: NoAction, onUpdate: NoAction, map: "entry_log_ibfk_2")
+  security_guard security_guard?       @relation(fields: [guard_id], references: [guard_id], onDelete: NoAction, onUpdate: NoAction, map: "entry_log_ibfk_3")
+  gate_log       gate_log[]
+
+  @@index([guard_id], map: "guard_id")
+  @@index([resident_id], map: "resident_id")
+  @@index([visitor_id], map: "visitor_id")
+}
+
+model gate {
+  gate_id   Int            @id @default(autoincrement())
+  gate_name String         @db.VarChar(50)
+  gate_type gate_gate_type
+  location  String?        @db.VarChar(100)
+  is_active Boolean?       @default(true)
+  gate_log  gate_log[]
+}
+
+model gate_log {
+  gate_log_id Int             @id @default(autoincrement())
+  gate_id     Int
+  log_id      Int
+  action      gate_log_action
+  log_time    DateTime?       @default(now()) @db.DateTime(0)
+  gate        gate            @relation(fields: [gate_id], references: [gate_id], onDelete: NoAction, onUpdate: NoAction, map: "gate_log_ibfk_1")
+  entry_log   entry_log       @relation(fields: [log_id], references: [log_id], onDelete: NoAction, onUpdate: NoAction, map: "gate_log_ibfk_2")
+
+  @@index([gate_id], map: "gate_id")
+  @@index([log_id], map: "log_id")
+}
+
+model incident {
+  incident_id    Int                @id @default(autoincrement())
+  incident_date  DateTime           @db.DateTime(0)
+  description    String?            @db.Text
+  severity       incident_severity?
+  reported_by    Int?
+  apartment_id   Int?
+  resolved       Boolean?           @default(false)
+  security_guard security_guard?    @relation(fields: [reported_by], references: [guard_id], onDelete: NoAction, onUpdate: NoAction, map: "incident_ibfk_1")
+  apartment      apartment?         @relation(fields: [apartment_id], references: [apartment_id], onDelete: NoAction, onUpdate: NoAction, map: "incident_ibfk_2")
+
+  @@index([apartment_id], map: "apartment_id")
+  @@index([reported_by], map: "reported_by")
+}
+
+model maintenance_request {
+  request_id    Int                         @id @default(autoincrement())
+  resident_id   Int
+  apartment_id  Int
+  request_date  DateTime?                   @default(now()) @db.DateTime(0)
+  issue_type    String?                     @db.VarChar(50)
+  description   String?                     @db.Text
+  status        maintenance_request_status? @default(pending)
+  resolved_date DateTime?                   @db.DateTime(0)
+  resident      resident                    @relation(fields: [resident_id], references: [resident_id], onDelete: NoAction, onUpdate: NoAction, map: "maintenance_request_ibfk_1")
+  apartment     apartment                   @relation(fields: [apartment_id], references: [apartment_id], onDelete: NoAction, onUpdate: NoAction, map: "maintenance_request_ibfk_2")
+
+  @@index([apartment_id], map: "apartment_id")
+  @@index([resident_id], map: "resident_id")
+}
+
+model parking_slot {
+  slot_id     Int                    @id @default(autoincrement())
+  slot_number String                 @unique(map: "slot_number") @db.VarChar(10)
+  floor_level Int?
+  slot_type   parking_slot_slot_type
+  is_occupied Boolean?               @default(false)
+  resident_id Int?
+  resident    resident?              @relation(fields: [resident_id], references: [resident_id], onDelete: NoAction, onUpdate: NoAction, map: "parking_slot_ibfk_1")
+
+  @@index([resident_id], map: "resident_id")
+}
+
+model resident {
+  resident_id         Int                   @id @default(autoincrement())
+  full_name           String                @db.VarChar(100)
+  phone               String?               @unique(map: "phone") @db.VarChar(15)
+  email               String?               @unique(map: "email") @db.VarChar(100)
+  apartment_id        Int?
+  move_in_date        DateTime?             @db.Date
+  access_card         access_card[]
+  emergency_contact   emergency_contact[]
+  entry_log           entry_log[]
+  maintenance_request maintenance_request[]
+  parking_slot        parking_slot[]
+  apartment           apartment?            @relation(fields: [apartment_id], references: [apartment_id], onDelete: NoAction, onUpdate: NoAction, map: "resident_ibfk_1")
+
+  @@index([apartment_id], map: "apartment_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model security_guard {
+  guard_id     Int                   @id @default(autoincrement())
+  full_name    String                @db.VarChar(100)
+  badge_number String?               @unique(map: "badge_number") @db.VarChar(20)
+  shift        security_guard_shift? @default(morning)
+  phone        String?               @unique(map: "uq_sg_phone") @db.VarChar(15)
+  blacklist    blacklist[]
+  entry_log    entry_log[]
+  incident     incident[]
+}
+
+model staff {
+  staff_id   Int       @id @default(autoincrement())
+  full_name  String    @db.VarChar(100)
+  role       String?   @db.VarChar(50)
+  phone      String?   @db.VarChar(15)
+  hired_date DateTime? @db.Date
+  is_active  Boolean?  @default(true)
+}
+
+model visitor {
+  visitor_id      Int         @id @default(autoincrement())
+  full_name       String      @db.VarChar(100)
+  phone           String?     @unique(map: "uq_visitor_phone") @db.VarChar(15)
+  id_proof_type   String?     @db.VarChar(30)
+  id_proof_number String?     @db.VarChar(30)
+  blacklist       blacklist[]
+  entry_log       entry_log[]
+}
+
+enum gate_gate_type {
+  main
+  emergency
+  service
+}
+
+enum entry_log_person_type {
+  resident
+  visitor
+}
+
+enum gate_log_action {
+  entry
+  exit
+}
+
+enum incident_severity {
+  low
+  medium
+  high
+  critical
+}
+
+enum parking_slot_slot_type {
+  two_wheeler
+  four_wheeler
+}
+
+enum security_guard_shift {
+  morning
+  evening
+  night
+}
+
+enum apartment_status {
+  occupied
+  vacant
+  maintenance
+}
+
+enum maintenance_request_status {
+  pending
+  in_progress
+  completed
+}
