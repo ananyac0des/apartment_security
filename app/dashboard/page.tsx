@@ -4,24 +4,31 @@ import { useEffect, useState } from "react";
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/dashboard")
-      .then((res) => res.json())
-      .then((d) => setData(d));
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Backend request failed");
+        }
+        return res.json();
+      })
+      .then((d) => setData(d))
+      .catch(() => setError("Unable to load dashboard data from backend."));
   }, []);
 
   if (!data) {
     return (
-      <div className="p-6 text-black text-lg">Loading dashboard...</div>
+      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-lg text-slate-200">
+        {error || "Loading dashboard..."}
+      </div>
     );
   }
 
   return (
-    <div className="p-6 bg-white min-h-screen text-black">
-      <h1 className="text-3xl font-bold mb-6 text-black">
-        Dashboard
-      </h1>
+    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-6 text-slate-100">
+      <h1 className="mb-6 text-3xl font-bold text-white">Security Dashboard</h1>
 
       {/* STATS */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -37,13 +44,13 @@ export default function DashboardPage() {
       </div>
 
       {/* LOGS */}
-      <h2 className="text-2xl font-semibold mt-10 mb-4 text-black">
+      <h2 className="mt-10 mb-4 text-2xl font-semibold text-white">
         Recent Entry Logs
       </h2>
 
-      <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+      <div className="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/60">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-300 text-black">
+          <thead className="bg-slate-800 text-slate-100">
             <tr>
               <th className="p-3">Time</th>
               <th className="p-3">Name</th>
@@ -57,7 +64,7 @@ export default function DashboardPage() {
             {data.recentLogs.map((log: any) => (
               <tr
                 key={log.log_id}
-                className="border-t hover:bg-gray-100"
+                className="border-t border-slate-800 hover:bg-slate-900/80"
               >
                 <td className="p-3">
                   {new Date(log.entry_time).toLocaleString()}
@@ -90,9 +97,9 @@ export default function DashboardPage() {
 // CARD COMPONENT
 function Card({ title, value }: any) {
   return (
-    <div className="bg-white border border-gray-300 shadow-md rounded-lg p-4 text-center">
-      <h3 className="text-black font-medium">{title}</h3>
-      <p className="text-2xl font-bold mt-2 text-blue-600">
+    <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-4 text-center">
+      <h3 className="font-medium text-slate-200">{title}</h3>
+      <p className="mt-2 text-2xl font-bold text-sky-300">
         {value}
       </p>
     </div>
