@@ -2,8 +2,31 @@
 
 import { useEffect, useState } from "react";
 
+type DashboardLog = {
+  log_id: number;
+  entry_time: string;
+  person_type: string;
+  purpose: string;
+  resident?: { full_name?: string | null } | null;
+  visitor?: { full_name?: string | null } | null;
+  security_guard?: { full_name?: string | null } | null;
+};
+
+type DashboardData = {
+  totalResidents: number;
+  totalVisitors: number;
+  totalGuards: number;
+  totalApartments: number;
+  occupiedApartments: number;
+  vacantApartments: number;
+  maintenanceApartments: number;
+  totalIncidents: number;
+  unresolvedIncidents: number;
+  recentLogs: DashboardLog[];
+};
+
 export default function DashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -61,7 +84,7 @@ export default function DashboardPage() {
           </thead>
 
           <tbody>
-            {data.recentLogs.map((log: any) => (
+            {data.recentLogs.map((log) => (
               <tr
                 key={log.log_id}
                 className="border-t border-slate-800 hover:bg-slate-900/80"
@@ -95,7 +118,7 @@ export default function DashboardPage() {
 }
 
 // CARD COMPONENT
-function Card({ title, value }: any) {
+function Card({ title, value }: { title: string; value: number }) {
   return (
     <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-4 text-center">
       <h3 className="font-medium text-slate-200">{title}</h3>
