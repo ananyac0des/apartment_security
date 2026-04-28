@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Apartment Security Management System
 
-## Getting Started
+A full-stack web application built using Next.js, Prisma, and MySQL to manage apartment security operations such as resident access, visitor control, entry logs, incidents, and maintenance.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Features
+
+### Access Control
+
+* Resident entry using access cards
+* Activate and deactivate cards
+* Expiry validation
+
+### Visitor Management
+
+* Approve or reject visitors
+* Block and unblock visitors using blacklist
+* Only approved visitors are allowed entry
+
+### Entry Logs
+
+* Entry and exit tracking
+* Guard-based logging
+* Gate-based entry system
+
+### Incidents
+
+* Record incidents with severity levels
+* Link incidents to apartments
+* Mark incidents as resolved
+
+### Maintenance Requests
+
+* Residents can raise maintenance issues
+* Admin can update status:
+
+  * pending
+  * in_progress
+  * completed
+
+### Database Modules
+
+* Residents
+* Visitors
+* Security Guards
+* Apartments
+* Gates and Gate Logs
+* Access Cards
+* Maintenance Requests
+* Incidents
+
+---
+
+## Tech Stack
+
+* Frontend: Next.js (App Router)
+* Backend: Next.js API Routes
+* Database: MySQL
+* ORM: Prisma
+* Styling: Tailwind CSS
+
+---
+
+## Setup Instructions
+
+### 1. Clone the repository
+
+```bash id="c1"
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Install dependencies
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash id="c2"
+npm install
+```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Configure environment variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create a `.env` file:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```env id="c3"
+DATABASE_URL="mysql://root:password@localhost:3306/apartmentsecurity"
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4. Setup database
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Create database:
+
+```sql id="c4"
+CREATE DATABASE apartmentsecurity;
+```
+
+Import data (if available):
+
+```bash id="c5"
+mysql -u root -p apartmentsecurity < db.sql
+```
+
+---
+
+### 5. Generate Prisma client
+
+```bash id="c6"
+npx prisma generate
+```
+
+---
+
+### 6. Run the application
+
+```bash id="c7"
+npm run dev
+```
+
+Open:
+
+```
+http://localhost:3000
+```
+
+---
+
+## Roles
+
+* Admin
+
+  * Manage residents, incidents, maintenance
+
+* Guard
+
+  * Log entries
+  * Approve or block visitors
+
+* Resident
+
+  * Raise maintenance requests
+
+---
+
+## Notes
+
+* `.env` is not included for security reasons
+* Ensure MySQL is running before starting
+* Use sample data or import SQL dump
+
+---
+
+## Future Improvements
+
+* Authentication system (JWT or NextAuth)
+* Parking management module
+* CCTV monitoring interface
+* Notification system
+
+---
+
+## Author
+
+Developed as a database management and full-stack application project.
