@@ -27,12 +27,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100 text-black">
-      <div className="bg-white p-6 shadow rounded w-80">
-        <h2 className="text-xl font-bold mb-4">Login</h2>
+    <div className="flex h-screen items-center justify-center bg-slate-950 px-4 text-slate-100">
+      <div className="w-full max-w-sm rounded-xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl">
+        <h2 className="mb-1 text-2xl font-bold">Secure Login</h2>
+        <p className="mb-4 text-sm text-slate-400">
+          Enter your role and ID to continue.
+        </p>
 
         <select
-          className="border p-2 w-full mb-3"
+          className="mb-3 w-full rounded-md border border-slate-700 bg-slate-950 p-2 text-slate-100 outline-none focus:border-sky-500"
           value={role}
           onChange={(e) => setRole(e.target.value)}
         >
@@ -41,7 +44,7 @@ export default function LoginPage() {
         </select>
 
         <input
-          className="border p-2 w-full mb-3"
+          className="mb-3 w-full rounded-md border border-slate-700 bg-slate-950 p-2 text-slate-100 outline-none focus:border-sky-500"
           placeholder="Enter ID"
           value={id}
           onChange={(e) => setId(e.target.value)}
@@ -49,7 +52,7 @@ export default function LoginPage() {
 
         <button
           onClick={handleLogin}
-          className="bg-blue-600 text-white w-full py-2 rounded"
+          className="w-full rounded-md bg-sky-600 py-2 font-semibold text-white transition hover:bg-sky-500"
         >
           Login
         </button>
