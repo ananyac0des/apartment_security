@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AccessCardsPage() {
     const [cards, setCards] = useState<any[]>([]);
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const router = useRouter();
 
     const [form, setForm] = useState({
         card_number: "",
@@ -19,7 +22,13 @@ export default function AccessCardsPage() {
     };
 
     useEffect(() => {
-        fetchCards();
+        const role = localStorage.getItem("role");
+        if (role !== "admin") {
+            router.push("/login");
+        } else {
+            setIsAuthorized(true);
+            fetchCards();
+        }
     }, []);
 
     const handleSubmit = async (e: any) => {
@@ -51,6 +60,8 @@ export default function AccessCardsPage() {
 
         fetchCards();
     };
+
+    if (!isAuthorized) return null;
 
     return (
         <div className="text-black p-6">

@@ -19,8 +19,8 @@ export default function Home() {
   useEffect(() => {
     const role = localStorage.getItem("role");
 
-    if (role !== "resident") {
-      alert("Access denied. Resident only.");
+    if (role !== "admin") {
+      alert("Access denied");
       router.push("/login");
     } else {
       setAuthorized(true);

@@ -173,6 +173,7 @@ model resident {
   entry_log           entry_log[]
   maintenance_request maintenance_request[]
   parking_slot        parking_slot[]
+  visitor             visitor[]
   apartment           apartment?            @relation(fields: [apartment_id], references: [apartment_id], onDelete: NoAction, onUpdate: NoAction, map: "resident_ibfk_1")
 
   @@index([apartment_id], map: "apartment_id")
@@ -205,8 +206,13 @@ model visitor {
   phone           String?     @unique(map: "uq_visitor_phone") @db.VarChar(15)
   id_proof_type   String?     @db.VarChar(30)
   id_proof_number String?     @db.VarChar(30)
+  resident_id     Int?
+  status          String?     @default("pending") @db.VarChar(50)
   blacklist       blacklist[]
   entry_log       entry_log[]
+  resident        resident?   @relation(fields: [resident_id], references: [resident_id], onDelete: NoAction, onUpdate: NoAction, map: "visitor_ibfk_1")
+
+  @@index([resident_id], map: "resident_id")
 }
 
 enum gate_gate_type {
